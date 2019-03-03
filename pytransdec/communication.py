@@ -206,8 +206,6 @@ class TransdecCommunication:
                               (0, 0, 255))
                 imshow('input', img)
                 waitKey(1)
-                if i == 20:
-                    break
             annotations[i] = observations
         # prepare dataframe for saving images
         df = DataFrame(data=annotations, columns=('filename',) + used_observations)
