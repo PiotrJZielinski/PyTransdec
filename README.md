@@ -183,3 +183,21 @@ Automatically collect data from Transdec Environment, saving images to `save_dir
   * `draw_annotations`: `bool`, *optional* - draw annotations on each showed image; has effect only when `show_img==True`; defaults to `False`
   * `print_annotations`: `bool`, *optional* - print each annotation in console; defaults to `False`
   * `progress_bar`: `bool`, *optional* - show neat progressbar for data collection; defaults to `True`
+
+### Example code for data collection
+
+```python
+with TransdecCommunication() as tc:
+        # collect 1000 positive examples with noise
+        tc.collect_data(positive=True, add_noise=True, n_images=1000, save_dir='collected_data',
+                        used_observations='all', show_img=True, draw_annotations=True)
+        # collect 1000 positive examples without noise
+        tc.collect_data(positive=True, add_noise=False, n_images=1000, save_dir='collected_data',
+                        used_observations='all', show_img=True, draw_annotations=True)
+        # collect 1000 negative examples with noise
+        tc.collect_data(positive=False, add_noise=True, n_images=1000, save_dir='collected_data',
+                        used_observations='all', show_img=True, draw_annotations=True)
+        # collect 1000 negative examples without noise
+        tc.collect_data(positive=False, add_noise=False, n_images=1000, save_dir='collected_data',
+                        used_observations='all', show_img=True, draw_annotations=True)
+```
