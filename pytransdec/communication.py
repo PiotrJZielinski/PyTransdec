@@ -62,7 +62,7 @@ class TransdecCommunication:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.env.close()
 
-    def reset(self, message: Dict, training: bool = True):
+    def reset(self, message: Dict = {}, training: bool = True):
         """reset the environment
         :param message: a dictionary defining a reset message;
         available keys are: 'CollectData' : {0, 1}, 'EnableNoise' : {0, 1}, 'Positive' : {0, 1}
