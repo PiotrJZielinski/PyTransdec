@@ -1,4 +1,4 @@
-from cv2 import COLOR_RGB2BGR, cvtColor, imshow, imwrite, rectangle
+from cv2 import COLOR_RGB2BGR, cvtColor, imshow, imwrite, rectangle, waitKey
 from errno import EEXIST
 from os import makedirs, walk
 from typing import Dict, List, Tuple, Union
@@ -175,7 +175,7 @@ class TransdecCommunication:
         # check already existing files
         files = [f for f in next(walk(save_dir))[2] if '.png' in f]
         if files:
-            start_num = int(files[-1][:-4]) + 1
+            start_num = max([int(f[:-4]) for f in files]) + 1
         # prepare array for collected observations
         annotations = np.zeros((n_images, len(used_observations) + 1), dtype=object)
         # reset environment accordingly
@@ -204,7 +204,10 @@ class TransdecCommunication:
                               (self.vector['bounding_box_x'] + self.vector['bounding_box_w'] // 2,
                                self.vector['bounding_box_y'] + self.vector['bounding_box_h'] // 2),
                               (0, 0, 255))
-                    imshow('input', img)
+                imshow('input', img)
+                waitKey(1)
+                if i == 20:
+                    break
             annotations[i] = observations
         # prepare dataframe for saving images
         df = DataFrame(data=annotations, columns=('filename',) + used_observations)
