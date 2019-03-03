@@ -62,14 +62,15 @@ class TransdecCommunication:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.env.close()
 
-    def reset(self, message: Dict):
+    def reset(self, message: Dict, training: bool = True):
         """reset the environment
         :param message: a dictionary defining a reset message;
         available keys are: 'CollectData' : {0, 1}, 'EnableNoise' : {0, 1}, 'Positive' : {0, 1}
+        :param training: run environment in train mode
         """
         if not all(k in RESET_KEYS for k in message.keys()):
             raise ResetKeyNotFound("Incorrect message. Check documentation for available reset keys.")
-        self.info = self.env.reset(message)[self.def_brain]
+        self.info = self.env.reset(train_mode=training, config=message)[self.def_brain]
         self.step()
 
     def step(self, action: List[float] = None):
