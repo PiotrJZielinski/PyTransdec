@@ -58,7 +58,7 @@ PyTransdec package automatically installs all required dependencies.
 
 ## Usage
 
-PyTransdec package contains `TransdecCommunication` class, which can be used to communicate with TransdecEnvironment. To import the package use following Python script:
+PyTransdec package contains `TransdecCommunication([file_name, worker_id])` class, which can be used to communicate with TransdecEnvironment. To import the package use following Python script:
 
 ```python
 from pytransdec import TransdecCommunication
@@ -70,6 +70,12 @@ You can then apply it using `with` statement:
 with TransdecCommunication() as tc:
   ...
 ```
+
+#### Parameters:
+  * `file_name`: `str`, *optional* - Unity Environment file to operate on; defaults to `None` (connect to Unity Editor)
+  * `worker_id`: `int`, *optional* - for more than 1 parallel workers - port incremental to be used for connection; defaults to `0`
+
+
 ### Methods
 |method/property|description|
 |---|---|
