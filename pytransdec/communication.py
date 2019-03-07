@@ -49,8 +49,12 @@ class TransdecCommunication:
     requires latest version of TransdecEnvironment (https://github.com/PiotrJZielinski/TransdecEnvironment)
     """
 
-    def __init__(self):
-        self.env = UnityEnvironment(file_name=None)
+    def __init__(self, file_name: str = None, worker_id: int = 0):
+        """
+        :param file_name: env file
+        :param worker_id: for more than 1 parallel worker
+        """
+        self.env = UnityEnvironment(file_name=file_name, worker_id=worker_id)
         self.def_brain = self.env.brain_names[0]
         self.brain = self.env.brains[self.def_brain]
         self.info: BrainInfo = None
@@ -62,14 +66,17 @@ class TransdecCommunication:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.env.close()
 
-    def reset(self, message: Dict):
+    def reset(self, message: Dict = None, training: bool = True):
         """reset the environment
         :param message: a dictionary defining a reset message;
         available keys are: 'CollectData' : {0, 1}, 'EnableNoise' : {0, 1}, 'Positive' : {0, 1}
+        :param training: run environment in train mode
         """
+        if not message:
+            message = {}
         if not all(k in RESET_KEYS for k in message.keys()):
             raise ResetKeyNotFound("Incorrect message. Check documentation for available reset keys.")
-        self.info = self.env.reset(message)[self.def_brain]
+        self.info = self.env.reset(train_mode=training, config=message)[self.def_brain]
         self.step()
 
     def step(self, action: List[float] = None):
