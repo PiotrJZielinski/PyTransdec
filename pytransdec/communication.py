@@ -28,7 +28,7 @@ OBSERVATIONS = {'a_x': 'acceleration_x',
                 'relative_z': 'relative_z',
                 'relative_yaw': 'relative_yaw'}
 
-RESET_KEYS = ['CollectData', 'EnableNoise', 'Positive']
+RESET_KEYS = ['CollectData', 'EnableNoise', 'Positive', 'AgentMaxSteps']
 
 
 class ObservationTypeNotFound(Exception):
