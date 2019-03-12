@@ -96,6 +96,7 @@ Reset the environment with reset `message` and update observations.
     * `'CollectData'`: if `0` - navigation mode; if `1` - data collection mode
     * `'EnableNoise'`: has effect only when `'CollectData' == 1`; if `0` - no noise added; if `1` - noise objects added on the image
     * `'Positive'`: has effect only when `'CollectData' == 1`; if `0` - collect negative examples (target object hidden); if `1` - collect positive examples (target object visible)
+    * `'AgentMaxSteps'`: after how many steps is the agent reset; if `0` - never
   * `training`: `bool`, *optional* - use TransdecEnvironment in training mode (if `True`) or in inference mode (if `False`); defaults to `true`
       
 |**`tc.step(action=[0.0, 0.0, 0.0, 0.0])`**|[*[source]*](https://github.com/PiotrJZielinski/PyTransdec/blob/b915c1b25653386024066c6c9f099181498fe5de/pytransdec/communication.py#L76)|
