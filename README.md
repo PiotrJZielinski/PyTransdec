@@ -84,7 +84,7 @@ with TransdecCommunication() as tc:
 |`tc.reward`|Current reward value|
 |`tc.vector`|Current vector observations dictionary|
 |`tc.visual`|Current visual observations list|
-|`tc.collect_data(positive, add_noise, n_images[, save_dir, start_num, annotation_margin, used_observations, show_img, draw_annotations, print_annotations, progress_bar])`|Automatically collect data from Transdec Environment|
+|`tc.collect_data(positive, add_noise, add_background, n_images[, save_dir, start_num, annotation_margin, used_observations, object_number, show_img, draw_annotations, print_annotations, progress_bar])`|Automatically collect data from Transdec Environment|
 
 |**`tc.reset(self, message={}, training=True)`**|[*[source]*](https://github.com/PiotrJZielinski/PyTransdec/blob/b915c1b25653386024066c6c9f099181498fe5de/pytransdec/communication.py#L65)|
 |---|---|
@@ -96,6 +96,8 @@ Reset the environment with reset `message` and update observations.
     * `'CollectData'`: if `0` - navigation mode; if `1` - data collection mode
     * `'EnableNoise'`: has effect only when `'CollectData' == 1`; if `0` - no noise added; if `1` - noise objects added on the image
     * `'Positive'`: has effect only when `'CollectData' == 1`; if `0` - collect negative examples (target object hidden); if `1` - collect positive examples (target object visible)
+    * `FocusedObject` - has effect only when `'CollectData' == 1`; specify which object is focused on collecting data (input: object number from `Data collection settings`)
+    * `EnableBackgroundImage` - has effect only when `'CollectData' == 1`; if `0` - transdec is background; if `1` - random images is background
     * `'AgentMaxSteps'`: after how many steps is the agent reset; if `0` - never
   * `training`: `bool`, *optional* - use TransdecEnvironment in training mode (if `True`) or in inference mode (if `False`); defaults to `true`
       
@@ -195,16 +197,13 @@ Automatically collect data from Transdec Environment, saving images to `save_dir
 
 ```python
 with TransdecCommunication() as tc:
-        # collect 1000 positive examples with noise
-        tc.collect_data(positive=True, add_noise=True, n_images=1000, save_dir='collected_data',
-                        used_observations='all', show_img=True, draw_annotations=True)
-        # collect 1000 positive examples without noise
-        tc.collect_data(positive=True, add_noise=False, n_images=1000, save_dir='collected_data',
-                        used_observations='all', show_img=True, draw_annotations=True)
-        # collect 1000 negative examples with noise
-        tc.collect_data(positive=False, add_noise=True, n_images=1000, save_dir='collected_data',
-                        used_observations='all', show_img=True, draw_annotations=True)
-        # collect 1000 negative examples without noise
-        tc.collect_data(positive=False, add_noise=False, n_images=1000, save_dir='collected_data',
-                        used_observations='all', show_img=True, draw_annotations=True)
+        # collect 1000 positive examples with noise of object 0
+        tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=1000, save_dir='collected_data/{}/train'.format(0),
+                        used_observations='all', object_number=0, show_img=True, draw_annotations=True)
+        # collect 1000 positive examples with custom backgrount of object 0
+        tc.collect_data(positive=True, add_noise=False, add_background=True, n_images=1000, save_dir='collected_data/{}/train'.format(0),
+                        used_observations='all', object_number=0, show_img=True, draw_annotations=True) 
+        # collect 1000 negative examples with noise of object 0
+        tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=1000, save_dir='collected_data/{}/train'.format(0),
+                        used_observations='all', object_number=0, show_img=True, draw_annotations=True)
 ```
