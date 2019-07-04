@@ -28,7 +28,12 @@ OBSERVATIONS = {'a_x': 'acceleration_x',
 				'relative_z': 'relative_z',
 				'relative_yaw': 'relative_yaw'}
 
-RESET_KEYS = ['CollectData', 'EnableNoise', 'Positive', 'AgentMaxSteps', 'FocusedObject', 'EnableBackgroundImage']
+CAMERA_FOCUS = {
+				'front_camera': 0,
+				'bottom_camera': 1
+				}
+
+RESET_KEYS = ['CollectData', 'EnableNoise', 'Positive', 'AgentMaxSteps', 'FocusedObject', 'EnableBackgroundImage', 'ForceToSaveAsNegative']
 
 
 class ObservationTypeNotFound(Exception):
@@ -83,9 +88,10 @@ class TransdecCommunication:
 	def step(self, action: List[float] = None):
 		"""make a step
 		:param action: action to be taken; 4 floats in range <-1, 1> defining x, y, z and yaw velocity
+										   5 float is camera information, 0 - front camera, 1 - bottom camera
 		"""
 		if not action:
-			action = [0.0, 0.0, 0.0, 0.0]
+			action = [0.0, 0.0, 0.0, 0.0, CAMERA_FOCUS['front_camera']]
 		if any(abs(a) > 1.0 for a in action):
 			raise WrongActionValue("Only actions in range <-1, 1> allowed.")
 		self.info = self.env.step(action)[self.def_brain]
@@ -150,12 +156,14 @@ class TransdecCommunication:
 		"""
 		return f'{n}'.zfill(n_digits) + f'.{file_type}'
 
-	def collect_data(self, positive: bool, add_noise: bool, add_background: bool, n_images: int, save_dir: str = 'collected_data',
+	def collect_data(self, positive: bool, add_noise: bool, 
+					 add_background: bool, n_images: int, force_to_save_as_negative: bool = False, save_dir: str = 'collected_data',
 					 start_num: int = 1, annotation_margin: int = 5, object_number = 0,
 					 used_observations: Union[str, Tuple[str, ...]] = ('x', 'y', 'w', 'h', 'p'), show_img: bool = False,
 					 draw_annotations: bool = False, print_annotations: bool = False, progress_bar: bool = True):
 		"""automatically collect data from Transdec Environment
 		:param positive: fetch positive examples
+		:param force_to_save_as_negative: force to save example as negative 
 		:param add_noise: include other objects in images
 		:param add_background: generate image as background (transdec environment disappears)
 		:param n_images: number of images to be collected
@@ -195,7 +203,8 @@ class TransdecCommunication:
 					  'EnableNoise': 1 if add_noise else 0,
 					  'Positive': 1 if positive else 0,
 					  'FocusedObject': object_number,
-					  'EnableBackgroundImage': 1 if add_background else 0
+					  'EnableBackgroundImage': 1 if add_background else 0,
+					  'ForceToSaveAsNegative': 1 if force_to_save_as_negative else 0
 					  }
 		self.reset(reset_dict)
 		print(f"Collecting {n_images} images from Unity environment")
@@ -238,13 +247,12 @@ class TransdecCommunication:
 if __name__ == '__main__':
 	with TransdecCommunication() as tc:
 		tc.reset()
-
-		#while 1:
-		#	tc.env.step([0, 0, 0, 0])[tc.def_brain]
-		for i in range(0, 6):
-			tc.collect_data(positive=True, add_noise=False, add_background=True, n_images=6000, save_dir='collected_data/{}/train'.format(i),
+		'''
+		#COLLECT DATA EXAMPLE
+		for i in range(14, 18):			
+			tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=6000, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=False)
-			tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=3000, save_dir='collected_data/{}/train'.format(i),
+			tc.collect_data(positive=True, add_noise=False, add_background=False, n_images=3000, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
 			tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=1000, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
@@ -254,7 +262,13 @@ if __name__ == '__main__':
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
 			tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=500, save_dir='collected_data/{}/valid'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
-		#tc.collect_data(positive=False, add_noise=True, n_images=1000, save_dir='collected_data',
-		#				used_observations='all', show_img=True, draw_annotations=True)
-		#tc.collect_data(positive=False, add_noise=False, n_images=1000, save_dir='collected_data',
-		#				used_observations='all', show_img=True, draw_annotations=True)
+		'''
+
+		
+		'''
+		#STEERING EXAMPLE
+		for i in range(100):
+			tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled 
+		for i in range(100):
+			tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
+		'''
