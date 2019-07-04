@@ -98,6 +98,7 @@ Reset the environment with reset `message` and update observations.
     * `'Positive'`: has effect only when `'CollectData' == 1`; if `0` - collect negative examples (target object hidden); if `1` - collect positive examples (target object visible)
     * `FocusedObject` - has effect only when `'CollectData' == 1`; specify which object is focused on collecting data (input: object number from `Data collection settings`)
     * `EnableBackgroundImage` - has effect only when `'CollectData' == 1`; if `0` - transdec is background; if `1` - random images is background
+    * `ForceToSaveAsNegative` - focus to save image as negative example, even if `Postive` is set to `True`
     * `'AgentMaxSteps'`: after how many steps is the agent reset; if `0` - never
   * `training`: `bool`, *optional* - use TransdecEnvironment in training mode (if `True`) or in inference mode (if `False`); defaults to `true`
       
@@ -112,6 +113,7 @@ Make a step in the environment (specified with `action`) and update observations
     * lateral movement (`1.0`: max right, `-1.0`: max left)
     * vertical movement (`1.0`: max upward, `-1.0`: max downward)
     * yaw rotation (`1.0`: max right turn, `-1.0`: max left turn)
+    * camera focus (`0`: front camera, `1`: bottom camera)
 
 |**`tc.reward`**|[*[source]*](https://github.com/PiotrJZielinski/PyTransdec/blob/b915c1b25653386024066c6c9f099181498fe5de/pytransdec/communication.py#L87)|
 |---|---|
