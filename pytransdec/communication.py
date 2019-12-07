@@ -272,3 +272,5 @@ if __name__ == '__main__':
 		for i in range(100):
 			tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
 		'''
+
+		tc.vector[0];
