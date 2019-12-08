@@ -1,5 +1,5 @@
 """
-Module includes BaseSensor class
+Module includes BaseCommunication class
 """
 import zmq
 import ast
@@ -10,7 +10,7 @@ from rpi_communication.definitions import DEFLOG
 from rpi_communication.rov_comm import Client
 
 
-class BaseSensor(metaclass=abc.ABCMeta):
+class BaseCommunication(metaclass=abc.ABCMeta):
     """
     All sensors in sensors directory shoud inherit after this class
     """

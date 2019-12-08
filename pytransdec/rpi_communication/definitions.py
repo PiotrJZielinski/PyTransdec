@@ -1,5 +1,5 @@
 class DEFLOG:
-    LOG_DIRECTORY = "logs/electro/"
+    LOG_DIRECTORY = "logs/"
 
     DEPTH_LOCAL_LOG = True
 

@@ -3,7 +3,7 @@ import abc
 
 class IDepthSensor(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def sendDepth(self, depth):
+    def send_depth(self, depth):
         pass
 
     @abc.abstractmethod

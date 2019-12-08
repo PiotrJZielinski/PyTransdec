@@ -18,7 +18,6 @@ class ZMQ_Server():
         :param client_port: -> port programu na rpi
         :param sleep_time: -> czas spania pomiędzy obsługą rządań [s]
         :param timeout: -> czas oczekiwania na otrzymanie lub odebranie wiadomości [ms]
-
         """
         self.data = data_template
         self.driver_up = False

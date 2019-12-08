@@ -1,9 +1,9 @@
 import abc
 
 
-class IDepthSensor(metaclass=abc.ABCMeta):
+class IEngineSlave(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def send_depth(self, depth):
+    def get_movements(self):
         pass
 
     @abc.abstractmethod

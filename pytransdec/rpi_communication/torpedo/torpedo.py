@@ -7,7 +7,7 @@ class DepthSensor(BaseCommunication, IDepthSensor):
     def __init__(self, port, is_log, log_file_name, log_directory):
         super(DepthSensor, self).__init__(port, is_log, log_file_name, log_directory)
 
-    def send_depth(self, depth):
+    def sendDepth(self, depth):
         self.client.send_data(depth)
 
     def log(self, msg, logtype='info'):
@@ -17,4 +17,4 @@ class DepthSensor(BaseCommunication, IDepthSensor):
 if __name__ == '__main__':
     depth_sensor = DepthSensor()
     while True:
-        self.send_depth(1)
+        self.client.send_data(depth)
