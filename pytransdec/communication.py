@@ -9,6 +9,9 @@ from pandas import DataFrame
 from tqdm import tqdm
 
 from definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS
+from rpi_communication.definitions import RPI_COMM_DICT
+
+from rpi_comm import RPi_Communication
 
 
 
@@ -221,13 +224,15 @@ class TransdecCommunication:
 
 
 if __name__ == '__main__':
+	rpi_comm = RPi_Communication()
+
 	with TransdecCommunication() as tc:
 		tc.reset()
-		'''
+		
 		#COLLECT DATA EXAMPLE
 		for i in range(14, 18):			
 			tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=6000, save_dir='collected_data/{}/train'.format(i),
-							used_observations='all', object_number=i, show_img=False, draw_annotations=False)
+							used_observations='all', object_number=i, show_img=True, draw_annotations=True)
 			tc.collect_data(positive=True, add_noise=False, add_background=False, n_images=3000, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
 			tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=1000, save_dir='collected_data/{}/train'.format(i),
@@ -238,15 +243,25 @@ if __name__ == '__main__':
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
 			tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=500, save_dir='collected_data/{}/valid'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
-		'''
+		
 
 		
-		'''
-		#STEERING EXAMPLE
-		for i in range(100):
-			tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled 
-		for i in range(100):
-			tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
-		'''
+		#STEERING EXAMPLE WITHOUT SENDING DATA TO RPI
+		while(True):
+			for i in range(100):
+				tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled
+			for i in range(100):
+				tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
 
-		tc.vector[0];
+
+		#STEERING EXAMPLE WITH SENDING DATA TO RPI
+		while(True):
+			for i in range(100):
+				tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled
+				rpi_comm.send_to_rpi(tc.vector) #send data to rpi
+			for i in range(100):
+				tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
+				rpi_comm.send_to_rpi(tc.vector) #send data to rpi
+				
+
+

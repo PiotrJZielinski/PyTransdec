@@ -3,11 +3,12 @@
     "",
     "\\pytransdec",
     "\\pytransdec\\rpi_communication",
+    "\\pytransdec\\rpi_communication\\ahrs",
     "\\pytransdec\\rpi_communication\\depth",
     "\\pytransdec\\rpi_communication\\distance",
     "\\pytransdec\\rpi_communication\\engine",
     "\\pytransdec\\rpi_communication\\logs"
   ],
-  "SelectedNode": "\\pytransdec\\rpi_communication\\engine\\engine.py",
+  "SelectedNode": "\\pytransdec\\rpi_comm.py",
   "PreviewInSolutionExplorer": false
 }

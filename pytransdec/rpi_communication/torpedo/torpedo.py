@@ -7,7 +7,7 @@ class DepthSensor(BaseCommunication, IDepthSensor):
     def __init__(self, port, is_log, log_file_name, log_directory):
         super(DepthSensor, self).__init__(port, is_log, log_file_name, log_directory)
 
-    def sendDepth(self, depth):
+    def send_depth(self, depth):
         self.client.send_data(depth)
 
     def log(self, msg, logtype='info'):

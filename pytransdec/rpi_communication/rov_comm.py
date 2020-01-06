@@ -107,7 +107,7 @@ class Client():
     def reboot(self):
         print("rebooting")
         self.context = zmq.Context()
-        print("Trying to reconnect…")
+        print(f"Trying to reconnect on port: {self.port}...")
         self.socket = self.context.socket(zmq.REQ)
         self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
         self.socket.connect("tcp://127.0.0.1:" + str(self.port))

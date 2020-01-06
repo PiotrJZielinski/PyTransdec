@@ -1,4 +1,7 @@
-OBSERVATIONS = {'a_x': 'acceleration_x',
+from typing import Dict, List, Tuple, Union
+
+OBSERVATIONS = {
+				'a_x': 'acceleration_x',
 				'a_y': 'acceleration_y',
 				'a_z': 'acceleration_z',
 				'eps_x': 'angular_acceleration_x',
@@ -16,7 +19,8 @@ OBSERVATIONS = {'a_x': 'acceleration_x',
 				'relative_x': 'relative_x',
 				'relative_y': 'relative_y',
 				'relative_z': 'relative_z',
-				'relative_yaw': 'relative_yaw'}
+				'relative_yaw': 'relative_yaw'
+}
 
 CAMERA_FOCUS = {
 				'front_camera': 0,
