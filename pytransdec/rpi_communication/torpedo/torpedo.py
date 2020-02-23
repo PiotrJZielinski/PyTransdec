@@ -1,20 +1,20 @@
 import time
 
-from rpi_communication.depth.IDepthSensor import IDepthSensor
+from rpi_communication.torpedo.ITorpedoController import ITorpedoController
 from rpi_communication.base_communication import BaseCommunication
 
-class DepthSensor(BaseCommunication, IDepthSensor):
+class TorpedoActivator(BaseCommunication, ITorpedoController):
     def __init__(self, port, is_log, log_file_name, log_directory):
-        super(DepthSensor, self).__init__(port, is_log, log_file_name, log_directory)
+        super(TorpedoActivator, self).__init__(port, is_log, log_file_name, log_directory)
 
-    def send_depth(self, depth):
-        self.client.send_data(depth)
+    def get_torpedo_data(self):
+        self.client.get_data()
 
     def log(self, msg, logtype='info'):
         if self.logger:
             self.logger.log(msg, logtype=logtype)
 
 if __name__ == '__main__':
-    depth_sensor = DepthSensor()
+    torpedo_activator = TorpedoActivator()
     while True:
-        self.client.send_data(depth)
+        torpedo_activator.get_torpedo_data()

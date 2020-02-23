@@ -8,11 +8,10 @@ from mlagents.envs import UnityEnvironment, BrainInfo
 from pandas import DataFrame
 from tqdm import tqdm
 
-from definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS
+from definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS, TORPEDO, BALL_GRAPPER
 from rpi_communication.definitions import RPI_COMM_DICT
 
 from rpi_comm import RPi_Communication
-
 
 
 class ObservationTypeNotFound(Exception):
@@ -54,23 +53,26 @@ class TransdecCommunication:
 		"""reset the environment
 		:param message: a dictionary defining a reset message;
 		available keys are: 'CollectData' : {0, 1}, 'EnableNoise' : {0, 1}, 'Positive' : {0, 1},
-							'WaterCurrent' : {0, 1}, 'FocusedObject' : {0, ..., 6}, 'EnableBackgroundImage': {0, 1}
+												'WaterCurrent' : {0, 1}, 'FocusedObject' : {0, ..., 6}, 'EnableBackgroundImage': {0, 1}
 		:param training: run environment in train mode
 		"""
 		if not message:
 			message = {}
 		if not all(k in RESET_KEYS for k in message.keys()):
-			raise ResetKeyNotFound("Incorrect message. Check documentation for available reset keys.")
-		self.info = self.env.reset(train_mode=training, config=message)[self.def_brain]
+			raise ResetKeyNotFound(
+				"Incorrect message. Check documentation for available reset keys.")
+		self.info = self.env.reset(train_mode=training, config=message)[
+			self.def_brain]
 		self.step()
 
 	def step(self, action: List[float] = None):
 		"""make a step
 		:param action: action to be taken; 4 floats in range <-1, 1> defining x, y, z and yaw velocity
-										   5 float is camera information, 0 - front camera, 1 - bottom camera
+																		   5 float is camera information, 0 - front camera, 1 - bottom camera
 		"""
 		if not action:
-			action = [0.0, 0.0, 0.0, 0.0, CAMERA_FOCUS['front_camera']]
+			action = [0.0, 0.0, 0.0, 0.0, CAMERA_FOCUS['front_camera'],
+					  TORPEDO['OFF'], BALL_GRAPPER['ON']]
 		if any(abs(a) > 1.0 for a in action):
 			raise WrongActionValue("Only actions in range <-1, 1> allowed.")
 		self.info = self.env.step(action)[self.def_brain]
@@ -94,10 +96,10 @@ class TransdecCommunication:
 		x2 = min(max(0, data['bounding_box_w']), shape[1] - 1)
 		y2 = min(max(0, data['bounding_box_h']), shape[0] - 1)
 		p = data['bounding_box_p']
-		x = int(x1 + (x2 - x1) // 2)
-		y = int(y1 + (y2 - y1) // 2)
-		w = int(x2 - x1 + 2 * self.margin)
-		h = int(y2 - y1 + 2 * self.margin)
+		x = float(x1 + (x2 - x1) / 2)
+		y = float(y1 + (y2 - y1) / 2)
+		w = float(x2 - x1 + 2 * self.margin)
+		h = float(y2 - y1 + 2 * self.margin)
 		data['bounding_box_x'] = x
 		data['bounding_box_y'] = y
 		data['bounding_box_w'] = w
@@ -135,9 +137,9 @@ class TransdecCommunication:
 		"""
 		return f'{n}'.zfill(n_digits) + f'.{file_type}'
 
-	def collect_data(self, positive: bool, add_noise: bool, 
+	def collect_data(self, positive: bool, add_noise: bool,
 					 add_background: bool, n_images: int, force_to_save_as_negative: bool = False, save_dir: str = 'collected_data',
-					 start_num: int = 1, annotation_margin: int = 5, object_number = 0,
+					 start_num: int = 1, annotation_margin: float = 0.01, object_number=0,
 					 used_observations: Union[str, Tuple[str, ...]] = ('x', 'y', 'w', 'h', 'p'), show_img: bool = False,
 					 draw_annotations: bool = False, print_annotations: bool = False, progress_bar: bool = True):
 		"""automatically collect data from Transdec Environment
@@ -164,7 +166,8 @@ class TransdecCommunication:
 		if used_observations == 'all':
 			used_observations = tuple(OBSERVATIONS.keys())
 		if not all(o in OBSERVATIONS.keys() for o in used_observations):
-			raise ObservationTypeNotFound("Incorrect used_observations. Check documentation for available observations")
+			raise ObservationTypeNotFound(
+				"Incorrect used_observations. Check documentation for available observations")
 		# create saving directory
 		try:
 			makedirs(save_dir)
@@ -176,7 +179,8 @@ class TransdecCommunication:
 		if files:
 			start_num = max([int(f[:-4]) for f in files]) + 1
 		# prepare array for collected observations
-		annotations = np.zeros((n_images, len(used_observations) + 1), dtype=object)
+		annotations = np.zeros(
+			(n_images, len(used_observations) + 1), dtype=object)
 		# reset environment accordingly
 		reset_dict = {'CollectData': 1,
 					  'EnableNoise': 1 if add_noise else 0,
@@ -195,23 +199,30 @@ class TransdecCommunication:
 			num = start_num + i
 			filename = self._pad_filename(num)
 			self.step()
-			observations = [filename] + [self.vector[OBSERVATIONS[o]] for o in used_observations]
+			observations = [filename] + [self.vector[OBSERVATIONS[o]]
+										 for o in used_observations]
 			img = cvtColor(self.visual[0], COLOR_RGB2BGR)
+			img_dimensions = img.shape
+			img_height = img_dimensions[0]
+			img_width = img_dimensions[1]
 			imwrite(f'{save_dir}/{filename}', img)
+			self.write_to_file(save_dir, filename, object_number)
 			if print_annotations:
 				print(observations)
 			if show_img:
 				if draw_annotations:
-					rectangle(img, (self.vector['bounding_box_x'] - self.vector['bounding_box_w'] // 2,
-									self.vector['bounding_box_y'] - self.vector['bounding_box_h'] // 2),
-							  (self.vector['bounding_box_x'] + self.vector['bounding_box_w'] // 2,
-							   self.vector['bounding_box_y'] + self.vector['bounding_box_h'] // 2),
-							  (0, 0, 255))
+					start_point = (int((self.vector['bounding_box_x'] - self.vector['bounding_box_w'] / 2) * img_width),
+								   int((self.vector['bounding_box_y'] - self.vector['bounding_box_h'] / 2) * img_height))
+					end_point = (int((self.vector['bounding_box_x'] + self.vector['bounding_box_w'] / 2) * img_width),
+								 int((self.vector['bounding_box_y'] + self.vector['bounding_box_h'] / 2) * img_height))
+					color = (0, 0, 255)
+					rectangle(img, start_point, end_point, color)
 				imshow('input', img)
 				waitKey(1)
 			annotations[i] = observations
 		# prepare dataframe for saving images
-		df = DataFrame(data=annotations, columns=('filename',) + used_observations)
+		df = DataFrame(data=annotations, columns=(
+			'filename',) + used_observations)
 		df.index += start_num - 1
 		# save annotations
 		if files:
@@ -222,16 +233,23 @@ class TransdecCommunication:
 				df.to_csv(f, header=True, index=False)
 		print(f'Saved {n_images} images with annotations')
 
+	def write_to_file(self, file_directory: str, file_name: str, class_num: str):
+			
+		file = open(f'{file_directory}/{file_name}.txt', 'w')
+		file.write(
+			f"{class_num} {self.vector['bounding_box_x']} {self.vector['bounding_box_y']} {self.vector['bounding_box_w']} {self.vector['bounding_box_h']}")
+		file.close()
 
 if __name__ == '__main__':
 	rpi_comm = RPi_Communication()
 
 	with TransdecCommunication() as tc:
 		tc.reset()
-		
-		#COLLECT DATA EXAMPLE
-		for i in range(14, 18):			
-			tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=6000, save_dir='collected_data/{}/train'.format(i),
+
+		'''
+		# COLLECT DATA EXAMPLE
+		for i in range(0, 1):
+			tc.collect_data(positive=True, add_noise=True, add_background=False, n_images=100, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=True, draw_annotations=True)
 			tc.collect_data(positive=True, add_noise=False, add_background=False, n_images=3000, save_dir='collected_data/{}/train'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
@@ -243,25 +261,23 @@ if __name__ == '__main__':
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
 			tc.collect_data(positive=False, add_noise=True, add_background=False, n_images=500, save_dir='collected_data/{}/valid'.format(i),
 							used_observations='all', object_number=i, show_img=False, draw_annotations=True)
-		
-
-		
-		#STEERING EXAMPLE WITHOUT SENDING DATA TO RPI
+		'''
+		# STEERING EXAMPLE WITHOUT SENDING DATA TO RPI
 		while(True):
 			for i in range(100):
-				tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled
+				# move forward, front camera is enabled
+				tc.step([1, 0, 0, 0, 0, 0, 0])
 			for i in range(100):
-				tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
+				# move backwards, bottom camera is enabled
+				tc.step([-1, 0, 0, 0, 1, 0, 0])
 
-
-		#STEERING EXAMPLE WITH SENDING DATA TO RPI
+		# STEERING EXAMPLE WITH SENDING DATA TO RPI
 		while(True):
 			for i in range(100):
-				tc.step([1, 0, 0, 0, 0]) #move forward, front camera is enabled
-				rpi_comm.send_to_rpi(tc.vector) #send data to rpi
+				# move forward, front camera is enabled
+				tc.step([1, 0, 0, 0, 0, 0, 0])
+				rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
 			for i in range(100):
-				tc.step([-1, 0, 0, 0, 1]) #move backwards, bottom camera is enabled
-				rpi_comm.send_to_rpi(tc.vector) #send data to rpi
-				
-
-
+				# move backwards, bottom camera is enabled
+				tc.step([-1, 0, 0, 0, 1, 0, 0])
+				rpi_comm.send_to_rpi(tc.vector)  # send data to rpi

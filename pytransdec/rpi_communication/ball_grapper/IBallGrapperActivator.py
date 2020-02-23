@@ -1,9 +1,9 @@
 import abc
 
 
-class ITorpedoController(metaclass=abc.ABCMeta):
+class IBallGrapperActivator(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def get_torpedo_data(self):
+    def get_ball_grapper_data(self):
         pass
 
     @abc.abstractmethod
