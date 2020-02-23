@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="PyTransdec",
-    version="0.0.3",
+    version="0.1.0",
     author="Piotr Zielinski",
     author_email="piotr_zielinski@g.pl",
     description="Transdec environment https://github.com/PiotrJZielinski/TransdecEnvironment controlling with Python",
