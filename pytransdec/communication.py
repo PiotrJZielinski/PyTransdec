@@ -8,10 +8,10 @@ from mlagents.envs import UnityEnvironment, BrainInfo
 from pandas import DataFrame
 from tqdm import tqdm
 
-from definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS, TORPEDO, BALL_GRAPPER
-from rpi_communication.definitions import RPI_COMM_DICT
+from .definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS, TORPEDO, BALL_GRAPPER
+#from rpi_communication.definitions import RPI_COMM_DICT
 
-from rpi_comm import RPi_Communication
+#from rpi_comm import RPi_Communication
 
 
 class ObservationTypeNotFound(Exception):
@@ -241,7 +241,7 @@ class TransdecCommunication:
 		file.close()
 
 if __name__ == '__main__':
-	rpi_comm = RPi_Communication()
+	#rpi_comm = RPi_Communication()
 
 	with TransdecCommunication() as tc:
 		tc.reset()
@@ -276,8 +276,8 @@ if __name__ == '__main__':
 			for i in range(100):
 				# move forward, front camera is enabled
 				tc.step([1, 0, 0, 0, 0, 0, 0])
-				rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
+				#rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
 			for i in range(100):
 				# move backwards, bottom camera is enabled
 				tc.step([-1, 0, 0, 0, 1, 0, 0])
-				rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
+				#rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
