@@ -8,7 +8,8 @@ from mlagents.envs import UnityEnvironment, BrainInfo
 from pandas import DataFrame
 from tqdm import tqdm
 
-from .definitions import OBSERVATIONS, CAMERA_FOCUS, RESET_KEYS, TORPEDO, BALL_GRAPPER
+from .definitions import OBSERVATIONS, CAMERAS, RESET_KEYS
+from .actions import Actions
 #from rpi_communication.definitions import RPI_COMM_DICT
 
 #from rpi_comm import RPi_Communication
@@ -67,14 +68,10 @@ class TransdecCommunication:
 
 	def step(self, action: List[float] = None):
 		"""make a step
-		:param action: action to be taken; 4 floats in range <-1, 1> defining x, y, z and yaw velocity
-																		   5 float is camera information, 0 - front camera, 1 - bottom camera
+		:param action: list containing actions taken by the agent, use Agent class fields as indices
 		"""
 		if not action:
-			action = [0.0, 0.0, 0.0, 0.0, CAMERA_FOCUS['front_camera'],
-					  TORPEDO['OFF'], BALL_GRAPPER['ON']]
-		if any(abs(a) > 1.0 for a in action):
-			raise WrongActionValue("Only actions in range <-1, 1> allowed.")
+			action = [0]*Actions.COUNT
 		self.info = self.env.step(action)[self.def_brain]
 
 	@property
@@ -266,18 +263,18 @@ if __name__ == '__main__':
 		while(True):
 			for i in range(100):
 				# move forward, front camera is enabled
-				tc.step([1, 0, 0, 0, 0, 0, 0])
+				tc.step([1, 0, 0, 0, 0, 0, 0, 0, 0])
 			for i in range(100):
 				# move backwards, bottom camera is enabled
-				tc.step([-1, 0, 0, 0, 1, 0, 0])
+				tc.step([-1, 0, 0, 0, 1, 0, 0, 0, 0])
 
 		# STEERING EXAMPLE WITH SENDING DATA TO RPI
 		while(True):
 			for i in range(100):
 				# move forward, front camera is enabled
-				tc.step([1, 0, 0, 0, 0, 0, 0])
+				tc.step([1, 0, 0, 0, 0, 0, 0, 0, 0])
 				#rpi_comm.send_to_rpi(tc.vector)  # send data to rpi
 			for i in range(100):
 				# move backwards, bottom camera is enabled
-				tc.step([-1, 0, 0, 0, 1, 0, 0])
+				tc.step([-1, 0, 0, 0, 1, 0, 0, 0, 0])
 				#rpi_comm.send_to_rpi(tc.vector)  # send data to rpi

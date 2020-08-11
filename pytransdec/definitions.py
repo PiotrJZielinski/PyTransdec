@@ -21,23 +21,15 @@ OBSERVATIONS = {
 				'relative_z': 'relative_z',
 				'relative_yaw': 'relative_yaw',
 				'grab_state': 'grab_state',
-				'is_torpedo_hit': 'is_torpedo_hit'
+				'is_torpedo_hit': 'is_torpedo_hit',
+				'torpedo_ready': 'torpedo_ready',
+				'front_distance': 'front_distance',
+				'hydrophone_angle': 'hydrophone_angle'
 }
 
-CAMERA_FOCUS = {
-				'front_camera': 0,
-				'bottom_camera': 1
-}
-
-BALL_GRAPPER = {
-				'ON': 1,
-				'OFF': 0	
-}
-
-
-TORPEDO = {
-		'ON': 1,
-		'OFF': 0	
+CAMERAS = {
+				'front': 0,
+				'bottom': 1
 }
 
 RESET_KEYS = ['CollectData', 'EnableNoise', 'Positive', 'AgentMaxSteps', 'FocusedObject', 'EnableBackgroundImage', 'ForceToSaveAsNegative']
