@@ -66,13 +66,13 @@ class TransdecCommunication:
 			self.def_brain]
 		self.step()
 
-	def step(self, action: List[float] = None):
+	def step(self, vector_action: List[float] = None, text_action: str = None):
 		"""make a step
 		:param action: list containing actions taken by the agent, use Agent class fields as indices
 		"""
-		if not action:
-			action = [0]*Actions.COUNT
-		self.info = self.env.step(action)[self.def_brain]
+		if not vector_action:
+			vector_action = [0]*Actions.COUNT
+		self.info = self.env.step(vector_action=vector_action, text_action=text_action)[self.def_brain]
 
 	@property
 	def reward(self) -> float:
